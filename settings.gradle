@@ -1,0 +1,2 @@
+include ':otp_listener', ':sampleapp'
+rootProject.name='otplistener'
