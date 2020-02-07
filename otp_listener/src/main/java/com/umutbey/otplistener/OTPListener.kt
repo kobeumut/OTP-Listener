@@ -70,6 +70,7 @@ class OTPListener(val activity: Activity) : LifecycleObserver {
         if (smsVerificationReceiver.isOrderedBroadcast) {
             smsVerificationReceiver.abortBroadcast()
             smsVerificationReceiver.clearAbortBroadcast()
+            activity.unregisterReceiver(smsVerificationReceiver)
         }
 
     }
