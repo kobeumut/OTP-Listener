@@ -16,6 +16,8 @@ import com.google.android.gms.common.api.Status
 class OTPListener(val activity: Activity) : LifecycleObserver {
     val CREDENTIAL_PICKER_REQUEST = 1
     val SMS_CONSENT_REQUEST = 2
+    var isSubscribeSMS: Boolean = false
+
     fun build(): OTPListener {
         ProcessLifecycleOwner.get()
             .lifecycle
@@ -56,8 +58,9 @@ class OTPListener(val activity: Activity) : LifecycleObserver {
         if (GoogleApiAvailabilityLight.getInstance().isGooglePlayServicesAvailable(activity) == ConnectionResult.SUCCESS) {
             val intentFilter = IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION)
             activity.registerReceiver(smsVerificationReceiver, intentFilter)
+            isSubscribeSMS = true
             val task =
-                SmsRetriever.getClient(activity!!).startSmsUserConsent(null)
+                SmsRetriever.getClient(activity).startSmsUserConsent(null)
             task.addOnSuccessListener { Log.d("OTPListener", "Task Running") }
             Log.d("OTPListener", "Value:$task")
         } else {
@@ -67,11 +70,9 @@ class OTPListener(val activity: Activity) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun stopSMSBroadcast() {
-        if (smsVerificationReceiver.isOrderedBroadcast) {
-            smsVerificationReceiver.abortBroadcast()
-            smsVerificationReceiver.clearAbortBroadcast()
+        if (isSubscribeSMS) {
             activity.unregisterReceiver(smsVerificationReceiver)
+            isSubscribeSMS = false
         }
-
     }
 }
